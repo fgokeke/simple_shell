@@ -54,7 +54,8 @@ void batch_mode(char **av)
  */
 int interactive_mode(char **av)
 {
-	char *lineptr = NULL, *lineptr_cpy = NULL, *shell_prompt = "fm_shell$ ", **av_cmd_line;
+	char *lineptr = NULL, *lineptr_cpy = NULL, *shell_prompt = "fm_shell$ ";
+	char **av_cmd_line;
 	const char *delimtr = " \n";
 	size_t nread = 0, count_token = 0;
 	ssize_t nchar_read;
@@ -82,7 +83,6 @@ int interactive_mode(char **av)
 				exe_cmmd(av_cmd_line);
 				free_av_cmd(av_cmd_line);
 				free(lineptr_cpy);
-				free(lineptr);
 				exit(EXIT_FAILURE);
 			}
 			else if (child_pid < 0)
