@@ -9,13 +9,14 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 
+void free_av_cmd(char **av_cmd_line);
 int exe_cmmd(char **av);
 char *_strcpy(char *dest, char *src);
 int _strlen(char *s);
 int fm_tokenize(char *lineptr, const char *delimtr);
 char **av_cmmd(char *lineptr_cpy, const char *delimtr, char **av,
 int count_token);
-int mem_alloc_error(char *s);
+void mem_alloc_error(char *s);
 char *locate_cmmd(char *cmmd);
 char *fm_getenv(char *var_name);
 extern char **environ;

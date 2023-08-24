@@ -28,6 +28,8 @@ void batch_mode(char **av)
 		if (child_pid == 0)
 		{
 			exe_cmmd(av_cmd_line);
+			free_av_cmd(av_cmd_line);
+			free(lineptr_cpy);
 			exit(0);
 		}
 		else if (child_pid < 0)
@@ -38,8 +40,8 @@ void batch_mode(char **av)
 		{
 			wait(NULL);
 		}
-			free(av_cmd_line);
-			free(lineptr_cpy);
+		free_av_cmd(av_cmd_line);
+		free(lineptr_cpy);
 	}
 	free(lineptr);
 	exit(0);
@@ -78,16 +80,16 @@ int interactive_mode(char **av)
 			if (child_pid == 0)
 			{
 				exe_cmmd(av_cmd_line);
+				free_av_cmd(av_cmd_line);
 				free(lineptr_cpy);
+				free(lineptr);
 				exit(EXIT_FAILURE);
 			}
 			else if (child_pid < 0)
 				perror("Fork failed");
 			else
-			{
 				wait(NULL);
-				free(av_cmd_line);
-			}
+			free_av_cmd(av_cmd_line);
 			free(lineptr_cpy);
 	}
 	free(lineptr);
