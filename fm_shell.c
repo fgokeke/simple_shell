@@ -21,7 +21,7 @@ void batch_mode(char **av)
 		fm_builtin(lineptr);
 		lineptr_cpy = malloc(nchar_read - 1);
 		mem_alloc_error(lineptr_cpy);
-		strncpy(lineptr_cpy, lineptr, nchar_read - 1);
+		_strncpy(lineptr_cpy, lineptr, nchar_read - 1);
 		count_token = fm_tokenize(lineptr, delimtr);
 		av_cmd_line = av_cmmd(lineptr_cpy, delimtr, av, count_token);
 		child_pid = fork();
@@ -38,6 +38,7 @@ void batch_mode(char **av)
 		{
 			wait(NULL);
 		}
+			free(av_cmd_line);
 			free(lineptr_cpy);
 	}
 	free(lineptr);
@@ -51,27 +52,23 @@ void batch_mode(char **av)
  */
 int interactive_mode(char **av)
 {
-	char *lineptr, *lineptr_cpy, *shell_prompt = "fm_shell$ ";
+	char *lineptr, *lineptr_cpy, *shell_prompt = "fm_shell$ ", **av_cmd_line;
 	const char *delimtr = " \n";
-	size_t nread = 0;
-	int count_token = 0;
+	size_t nread = 0, count_token = 0;
 	ssize_t nchar_read;
-	char **av_cmd_line;
 	pid_t child_pid;
 
 	for (;;)
 	{
-		write(STDOUT_FILENO, shell_prompt, strlen(shell_prompt));
+		write(STDOUT_FILENO, shell_prompt, _strlen(shell_prompt));
 		nchar_read = getline(&lineptr, &nread, stdin);
 		fm_builtin(lineptr);
 		if (nchar_read == -1)
 		{
 			write(STDIN_FILENO, "\n", 2);
+			free(lineptr);
 			return (-1);
 		}
-
-		else
-		{
 			lineptr_cpy = malloc(sizeof(char) * nchar_read);
 			mem_alloc_error(lineptr_cpy);
 			_strcpy(lineptr_cpy, lineptr);
@@ -81,17 +78,19 @@ int interactive_mode(char **av)
 			if (child_pid == 0)
 			{
 				exe_cmmd(av_cmd_line);
+				free(lineptr_cpy);
 				exit(EXIT_FAILURE);
 			}
 			else if (child_pid < 0)
 				perror("Fork failed");
 			else
+			{
 				wait(NULL);
-		}
+				free(av_cmd_line);
+			}
+			free(lineptr_cpy);
 	}
 	free(lineptr);
-	free(lineptr_cpy);
-
 	return (0);
 }
 /**
