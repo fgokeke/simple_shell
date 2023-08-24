@@ -9,7 +9,7 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 
-void exe_cmmd(char **av);
+int exe_cmmd(char **av);
 char *_strcpy(char *dest, char *src);
 int _strlen(char *s);
 int fm_tokenize(char *lineptr, const char *delimtr);
