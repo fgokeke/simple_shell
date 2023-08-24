@@ -6,7 +6,7 @@
  *
  * Return: Nothing.
  */
-void exe_cmmd(char **av)
+int exe_cmmd(char **av)
 {
 	char *cmmd;
 
@@ -16,7 +16,8 @@ void exe_cmmd(char **av)
 		if (execve(cmmd, av, environ) == -1)
 		{
 			perror("Error");
+			return (1);
 		}
 	}
-
+	return (0);
 }
