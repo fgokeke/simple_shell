@@ -47,7 +47,7 @@ void batch_mode(char **av)
  * interactive_mode - to handle interactive mode.
  * @av: argument vector.
  *
- * Return: 0 on suchess, -1 on failure.
+ * Return: 0 on success, -1 on failure.
  */
 int interactive_mode(char **av)
 {
@@ -65,7 +65,10 @@ int interactive_mode(char **av)
 		nchar_read = getline(&lineptr, &nread, stdin);
 		fm_builtin(lineptr);
 		if (nchar_read == -1)
+		{
+			write(STDIN_FILENO, "\n", 2);
 			return (-1);
+		}
 
 		else
 		{
