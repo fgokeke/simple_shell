@@ -7,12 +7,11 @@
  *
  * Return: -1 for error, 0 for success.
  */
-int mem_alloc_error(char *s)
+void mem_alloc_error(char *s)
 {
 	if (s == NULL)
 	{
 		perror("memory allocation failed");
-		return (-1);
+		exit(EXIT_FAILURE);
 	}
-	return (0);
 }
