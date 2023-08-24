@@ -54,7 +54,7 @@ void batch_mode(char **av)
  */
 int interactive_mode(char **av)
 {
-	char *lineptr, *lineptr_cpy, *shell_prompt = "fm_shell$ ", **av_cmd_line;
+	char *lineptr = NULL, *lineptr_cpy = NULL, *shell_prompt = "fm_shell$ ", **av_cmd_line;
 	const char *delimtr = " \n";
 	size_t nread = 0, count_token = 0;
 	ssize_t nchar_read;
@@ -71,7 +71,7 @@ int interactive_mode(char **av)
 			free(lineptr);
 			return (-1);
 		}
-			lineptr_cpy = malloc(sizeof(char) * nchar_read);
+			lineptr_cpy = malloc(sizeof(char) * (nchar_read + 1));
 			mem_alloc_error(lineptr_cpy);
 			_strcpy(lineptr_cpy, lineptr);
 			count_token = fm_tokenize(lineptr, delimtr);
