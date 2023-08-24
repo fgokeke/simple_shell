@@ -11,6 +11,9 @@ char *copy_fm_path(char *fm_path)
 	char *fm_path_cpy;
 
 	fm_path = fm_getenv("PATH");
+	if (fm_path == NULL)
+		return (NULL);
+
 	fm_path_cpy = _strdup(fm_path);
 	mem_alloc_error(fm_path_cpy);
 
