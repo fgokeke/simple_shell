@@ -13,7 +13,7 @@ void exe_cmmd(char **av)
 	if (av)
 	{
 		cmmd = locate_cmmd(av[0]);
-		if (execve(cmmd, av, NULL) == -1)
+		if (execve(cmmd, av, environ) == -1)
 		{
 			perror("Error");
 		}
