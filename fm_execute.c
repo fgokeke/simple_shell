@@ -22,7 +22,7 @@ int exec(char **avs, char **av)
 	{
 		execve(avs[0], avs, environ);
 		perror(av[0]);
-		exit(2);
+		exit(127);
 	}
 	else
 	{
@@ -33,6 +33,7 @@ int exec(char **avs, char **av)
 		errno = stat;
 
 		free(avs);
+		/*return (stat);*/
 	}
 	return (stat);
 }
