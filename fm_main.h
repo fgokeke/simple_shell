@@ -1,33 +1,36 @@
 #ifndef FM_MAIN_H
 #define FM_MAIN_H
-#include <unistd.h>
+
 #include <stdio.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <sys/stat.h>
-#include <errno.h>
 
-void free_av_cmd(char **av_cmd_line);
-int exe_cmmd(char **av);
+void err_msg(char *program, int count_cmd, char *cmd);
+/*void free_arr(int ac, char **av);*/
+
+extern char **environ;
+int exit_num;
+int exec(char **avs, char **av);
+int full_exec(char **avs, char **av, char *complete_cmd);
+char *fm_complete_path(char *paths, char *cmd);
+char *pathenv(void);
+void handle_comments(char *lineptr);
+int fm_builtins_handler(char **avs, char *lineptr);
+char **tokenize_str(char *str);
 char *_strcpy(char *dest, char *src);
 int _strlen(char *s);
-int fm_tokenize(char *lineptr, const char *delimtr);
-char **av_cmmd(char *lineptr_cpy, const char *delimtr, char **av,
-int count_token);
-void mem_alloc_error(char *s);
-char *locate_cmmd(char *cmmd);
-char *fm_getenv(char *var_name);
-extern char **environ;
 char *_strncpy(char *dest, char *src, int n);
 char *_strchr(const char *str, char c);
 char *_strdup(char *s);
 int _strncmp(char *s1, char *s2, size_t n);
-void fm_builtin(char *input);
 int _strcmp(char *s1, char *s2);
 size_t _strcspn(const char *str, const char *set);
 char *_strtok(char *str, const char *delim);
+char *_strcat(char *dest, char *src);
 
 #endif
