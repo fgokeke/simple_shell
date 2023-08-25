@@ -23,7 +23,7 @@ int full_exec(char **avs, char **av, char *complete_cmd)
 	{
 		execve(complete_cmd, avs, environ);
 		perror(av[0]);
-		exit(2);
+		exit(127);
 	}
 	else
 	{
@@ -34,6 +34,7 @@ int full_exec(char **avs, char **av, char *complete_cmd)
 
 		free(complete_cmd);
 		free(avs);
+		/*return (stat);*/
 	}
 	return (stat);
 }
