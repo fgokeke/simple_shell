@@ -11,7 +11,6 @@
 #include <sys/wait.h>
 
 void err_msg(char *program, int count_cmd, char *cmd);
-/*void free_arr(int ac, char **av);*/
 
 extern char **environ;
 int exit_num;
