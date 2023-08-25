@@ -1,115 +1,85 @@
 #include "fm_main.h"
 
+void print_prompt(int shell_mode);
+char *read_input(ssize_t nchar_read);
+/*void final_exec(char **av, char *lineptr, int err_count);*/
 /**
- * batch_mode - to handle batch mode.
+ * main - shell main function.
+ * @ac: argument count.
  * @av: argument vector.
  *
- * Return: Nothing.
+ * Return: errno
  */
-void batch_mode(char **av)
-{
-	char *lineptr = NULL, *lineptr_cpy = NULL;
-	const char *delimtr = " \n";
-	size_t nread = 0;
-	int count_token = 0;
-	ssize_t nchar_read;
-	char **av_cmd_line;
-	pid_t child_pid;
-
-	while ((nchar_read = getline(&lineptr, &nread, stdin)) != -1)
-	{
-		fm_builtin(lineptr);
-		lineptr_cpy = malloc(nchar_read - 1);
-		mem_alloc_error(lineptr_cpy);
-		_strncpy(lineptr_cpy, lineptr, nchar_read - 1);
-		count_token = fm_tokenize(lineptr, delimtr);
-		av_cmd_line = av_cmmd(lineptr_cpy, delimtr, av, count_token);
-		child_pid = fork();
-		if (child_pid == 0)
-		{
-			exe_cmmd(av_cmd_line);
-			free_av_cmd(av_cmd_line);
-			free(lineptr_cpy);
-			exit(0);
-		}
-		else if (child_pid < 0)
-		{
-			perror("Fork failed");
-		}
-		else
-		{
-			wait(NULL);
-		}
-		free_av_cmd(av_cmd_line);
-		free(lineptr_cpy);
-	}
-	free(lineptr);
-	exit(0);
-}
-/**
- * interactive_mode - to handle interactive mode.
- * @av: argument vector.
- *
- * Return: 0 on success, -1 on failure.
- */
-int interactive_mode(char **av)
-{
-	char *lineptr = NULL, *lineptr_cpy = NULL, *shell_prompt = "fm_shell$ ";
-	char **av_cmd_line;
-	const char *delimtr = " \n";
-	size_t nread = 0, count_token = 0;
-	ssize_t nchar_read;
-	pid_t child_pid;
-
-	for (;;)
-	{
-		write(STDOUT_FILENO, shell_prompt, _strlen(shell_prompt));
-		nchar_read = getline(&lineptr, &nread, stdin);
-		fm_builtin(lineptr);
-		if (nchar_read == -1)
-		{
-			write(STDIN_FILENO, "\n", 2);
-			free(lineptr);
-			return (-1);
-		}
-			lineptr_cpy = malloc(sizeof(char) * (nchar_read + 1));
-			mem_alloc_error(lineptr_cpy);
-			_strcpy(lineptr_cpy, lineptr);
-			count_token = fm_tokenize(lineptr, delimtr);
-			av_cmd_line = av_cmmd(lineptr_cpy, delimtr, av, count_token);
-			child_pid = fork();
-			if (child_pid == 0)
-			{
-				exe_cmmd(av_cmd_line);
-				free_av_cmd(av_cmd_line);
-				free(lineptr_cpy);
-				free(lineptr);
-				exit(EXIT_FAILURE);
-			}
-			else if (child_pid < 0)
-				perror("Fork failed");
-			else
-				wait(NULL);
-			free_av_cmd(av_cmd_line);
-			free(lineptr_cpy);
-	}
-	free(lineptr);
-	return (0);
-}
-/**
-* main - a simple shell.
-* @ac: argument count.
-* @av: argument vector.
-*
-* Return: Always 0.
-*/
 int main(int ac __attribute__((unused)), char **av)
 {
-	if (!isatty(fileno(stdin)))
-		batch_mode(av);
+	int shell_mode = isatty(0);
+	char *lineptr = NULL, cmmd, **avs = NULL, *complete_cmd = NULL;
+	ssize_t nchar_read = 0;
+	int err_count = 0, builtin_status = 0;
 
-	else
-		interactive_mode(av);
+	errno = 0;
+	for (;;)
+	{
+		err_count++;
+		print_prompt(shell_mode);
+		lineptr = read_input(nchar_read);
+		handle_comments(lineptr);
+		avs = tokenize_str(lineptr);
+		if (avs[0] == NULL)
+		{
+			free(avs);
+			continue;
+		}
+		if (access(avs[0], X_OK) == -1)
+		{
+			builtin_status = fm_builtins_handler(avs, lineptr);
+			if (builtin_status == 1)
+				continue;
+			complete_cmd = fm_complete_path(pathenv(), avs[0]);
+			if (complete_cmd == NULL)
+			{
+				cmmd = (err_count + '0');
+				err_msg(av[0], cmmd, avs[0]);
+				free(avs);
+				errno = 127;
+				continue;
+			}
+			full_exec(avs, av, complete_cmd);
+			continue;
+		}
+		exec(avs, av);
+	}
+	return (errno);
+}
 
-	return (0);
+/**
+ * print_prompt - Handles the printing of input
+ * @shell_mode: shell_mode variable
+ *
+ * Return: Nothing.
+*/
+void print_prompt(int shell_mode)
+{
+	if (shell_mode == 1)
+	write(STDOUT_FILENO, "fm_shell$ ", 10);
+}
+
+/**
+ * read_input - Handles the reading of input.
+ * @nchar_read: number of char read.
+ *
+ * Return:lineptr.
+ */
+char *read_input(ssize_t nchar_read)
+{
+	char *lineptr = NULL;
+	size_t nread = 0;
+
+	nchar_read = getline(&lineptr, &nread, stdin);
+	if (nchar_read == -1)
+	{
+		free(lineptr);
+		exit(errno);
+	}
+	return (lineptr);
 }

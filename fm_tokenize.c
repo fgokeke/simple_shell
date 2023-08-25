@@ -1,24 +1,31 @@
 #include "fm_main.h"
 
 /**
- * fm_tokenize - to count number of tokens.
- * @lineptr: the command to be tokenized.
- * @delimtr: the delimiter.
+ * tokenize_str - to tokenizes a string.
+ * @str: string to be tokenized.
  *
- * Return: the number of tokens.
+ * Return: array of tokens.
  */
-int fm_tokenize(char *lineptr, const char *delimtr)
+
+char **tokenize_str(char *str)
 {
-	char *fm_token;
+	char **token_array = NULL, *token = NULL;
 	int count_token = 0;
+	char *delim = " \n";
 
-	fm_token = _strtok(lineptr, delimtr);
-	while (fm_token != NULL)
+	token_array = malloc(sizeof(char *) * 25);
+	if (token_array == NULL)
+		return (NULL);
+
+	token = _strtok(str, delim);
+
+	while (token != NULL)
 	{
+		token_array[count_token] = token;
+		token = _strtok(NULL, delim);
 		count_token++;
-		fm_token = _strtok(NULL, delimtr);
 	}
-	count_token++;
 
-	return (count_token);
+	token_array[count_token] = NULL;
+	return (token_array);
 }
