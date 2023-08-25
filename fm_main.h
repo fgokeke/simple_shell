@@ -8,6 +8,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
+#include <errno.h>
 
 void free_av_cmd(char **av_cmd_line);
 int exe_cmmd(char **av);

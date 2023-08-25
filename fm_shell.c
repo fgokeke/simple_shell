@@ -8,7 +8,7 @@
  */
 void batch_mode(char **av)
 {
-	char *lineptr, *lineptr_cpy;
+	char *lineptr = NULL, *lineptr_cpy = NULL;
 	const char *delimtr = " \n";
 	size_t nread = 0;
 	int count_token = 0;
@@ -83,6 +83,7 @@ int interactive_mode(char **av)
 				exe_cmmd(av_cmd_line);
 				free_av_cmd(av_cmd_line);
 				free(lineptr_cpy);
+				free(lineptr);
 				exit(EXIT_FAILURE);
 			}
 			else if (child_pid < 0)
