@@ -28,26 +28,34 @@ int main(int ac __attribute__((unused)), char **av)
 		if (avs[0] == NULL)
 		{
 			free(avs);
+			free(lineptr);
 			continue;
 		}
 		if (access(avs[0], X_OK) == -1)
 		{
 			builtin_status = fm_builtins_handler(avs, lineptr);
 			if (builtin_status == 1)
+			{
+				free(avs);
+				free(lineptr);
 				continue;
+			}
 			complete_cmd = fm_complete_path(pathenv(), avs[0]);
 			if (complete_cmd == NULL)
 			{
 				cmmd = (err_count + '0');
 				err_msg(av[0], cmmd, avs[0]);
 				free(avs);
+				free(lineptr);
 				errno = 127;
 				continue;
 			}
 			full_exec(avs, av, complete_cmd);
+			free(complete_cmd);
 			continue;
 		}
 		exec(avs, av);
+		free(lineptr);
 	}
 	return (errno);
 }
